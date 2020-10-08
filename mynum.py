@@ -2,13 +2,14 @@ from numpy import *
 from matplotlib.pyplot import *
 from matplotlib.patches import Patch
 
-# f in the IVP y’ = f(t,y), y(x0)=y0
+
+def set_func():
+    pass
+
+
+# f в y’ = f(x,y), y(x0)=y0
 def f(x, y):
     return (x - 3.2) * y + 8 * x * exp((x - 3.2) ** 2 / 2) * cos(4 * x ** 2)
-
-
-def dfy(x, y):
-    return x - 3.2
 
 
 # analytic solution to the IVP y’ = f(t,y), y(x0)=y0
@@ -17,7 +18,7 @@ def sol(x, x0, y0):
     return exp((x - 3.2) ** 2 / 2) * (sin(4 * x ** 2) + C)
 
 
-# Runge-Kutta "Classic" Order 4 method
+# Метод Рунге-Кутты
 def runge_kutta(x0, xn, n, y0):
     h = abs(xn - x0) / n
     x = linspace(x0, xn, n + 1)
@@ -32,39 +33,23 @@ def runge_kutta(x0, xn, n, y0):
     return y
 
 
-# Adams-Bashforth 3 Step Method
-def adams_3(x0, xn, n, y0):
-    step = abs(xn - x0) / n
-    x = linspace(x0, xn, n + 1)
-    y = zeros(n + 1)
-    y[0:3] = runge_kutta(x0, x0 + 2 * step, 2, y0)
-    K1 = f(x[1], y[1])
-    K2 = f(x[0], y[0])
-    for i in range(2, n):
-        K3 = K2
-        K2 = K1
-        K1 = f(x[i], y[i])
-        y[i + 1] = y[i] + step * (23 * K1 - 16 * K2 + 5 * K3) / 12
-    return y
-
-
-# Adams-Bashforth 3/Moulton 4 Step Predictor/Corrector
+# Метод Адамса с предиктором и корректором
 def adams_precor(x0, xn, n, y0):
-    step = abs(xn - x0) / n
+    h = abs(xn - x0) / n
     x = linspace(x0, xn, n + 1)
     y = zeros(n + 1)
-    # Calculate initial steps with Runge-Kutta 4
-    y[0:3] = runge_kutta(x0, x0 + 2 * step, 2, y0)
+    # Вычисляем начальные шаги с помощью метода РК
+    y[0:3] = runge_kutta(x0, x0 + 2 * h, 2, y0)
     K1 = f(x[1], y[1])
     K2 = f(x[0], y[0])
     for i in range(2, n):
         K3 = K2
         K2 = K1
         K1 = f(x[i], y[i])
-        # Adams-Bashforth Predictor
-        y[i + 1] = y[i] + step * (23 * K1 - 16 * K2 + 5 * K3) / 12
+        # Предиктор
+        y[i + 1] = y[i] + h * (23 * K1 - 16 * K2 + 5 * K3) / 12
         K0 = f(x[i + 1], y[i + 1])
-        # Adams-Moulton Corrector
-        y[i + 1] = y[i] + step * (9 * K0 + 19 * K1 - 5 * K2 + K3) / 24
+        # Корректор
+        y[i + 1] = y[i] + h * (9 * K0 + 19 * K1 - 5 * K2 + K3) / 24
     return y
 

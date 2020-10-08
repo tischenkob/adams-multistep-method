@@ -5,7 +5,6 @@ from mynum import *
 print_selection_of(function_strings)
 function = read_int("Choose a function: ")
 
-# Script to produce graphs
 fg = 1
 n = 300
 x0 = 0
